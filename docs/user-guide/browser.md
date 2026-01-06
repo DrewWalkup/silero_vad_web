@@ -105,6 +105,10 @@ export default defineConfig({
           dest: "./",
         },
         {
+          src: "node_modules/@ricky0123/vad-web/dist/silero_vad_v6.onnx",
+          dest: "./",
+        },
+        {
           src: "node_modules/@ricky0123/vad-web/dist/silero_vad_legacy.onnx",
           dest: "./",
         },
