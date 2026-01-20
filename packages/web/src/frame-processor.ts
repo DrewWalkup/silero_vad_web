@@ -36,7 +36,7 @@ export interface FrameProcessorOptions {
    * Length of audio in ms to emit at a time. It's not quaranteed that this exact amount will be emitted each time,
    * but the processor will try to be as close as possible to this value. 0 means that chunks won't be emitted.
    */
-  framesToEmitMs: number  
+  framesToEmitMs: number
 
   /**
    * If true, when the user pauses the VAD, it may trigger `onSpeechEnd`.
@@ -119,7 +119,12 @@ function calculateFrameParams(
   const preSpeechPadFrames = Math.floor(options.preSpeechPadMs / msPerFrame)
   const minSpeechFrames = Math.floor(options.minSpeechMs / msPerFrame)
   const framesToEmitFrames = Math.floor(options.framesToEmitMs / msPerFrame)
-  return { redemptionFrames, preSpeechPadFrames, minSpeechFrames, framesToEmitFrames }
+  return {
+    redemptionFrames,
+    preSpeechPadFrames,
+    minSpeechFrames,
+    framesToEmitFrames,
+  }
 }
 
 export class FrameProcessor implements FrameProcessorInterface {
@@ -143,8 +148,12 @@ export class FrameProcessor implements FrameProcessorInterface {
     public msPerFrame: number
   ) {
     this.audioBuffer = []
-    const { redemptionFrames, preSpeechPadFrames, minSpeechFrames, framesToEmitFrames } =
-      calculateFrameParams(this.options, this.msPerFrame)
+    const {
+      redemptionFrames,
+      preSpeechPadFrames,
+      minSpeechFrames,
+      framesToEmitFrames,
+    } = calculateFrameParams(this.options, this.msPerFrame)
     this.redemptionFrames = redemptionFrames
     this.preSpeechPadFrames = preSpeechPadFrames
     this.minSpeechFrames = minSpeechFrames
@@ -184,7 +193,11 @@ export class FrameProcessor implements FrameProcessorInterface {
   }
 
   tryFlushAudioBuffer = (handleEvent: (event: FrameProcessorEvent) => void) => {
-    if (this.framesToEmitFrames <= 0 || !this.speechRealStartFired || this.audioBuffer.length < this.framesToEmitFrames) {
+    if (
+      this.framesToEmitFrames <= 0 ||
+      !this.speechRealStartFired ||
+      this.audioBuffer.length < this.framesToEmitFrames
+    ) {
       return
     }
     const audio = concatArrays(this.audioBuffer.map((item) => item.frame))
@@ -200,7 +213,6 @@ export class FrameProcessor implements FrameProcessorInterface {
     this.reset()
 
     if (speaking) {
-      
       if (speechFrameCount >= this.minSpeechFrames) {
         const audio = concatArrays(audioBuffer.map((item) => item.frame))
         handleEvent({ msg: Message.SpeechEnd, audio })

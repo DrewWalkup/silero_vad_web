@@ -535,7 +535,7 @@ export class MicVAD {
         break
 
       case Message.EmitChunk:
-        this.options.onEmitChunk(ev.audio)
+        void this.options.onEmitChunk(ev.audio)
         break
     }
   }
