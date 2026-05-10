@@ -543,6 +543,7 @@ const settableParamsToVADParams = async (
     redemptionMs: settableParams.redemptionMs,
     preSpeechPadMs: settableParams.preSpeechPadMs,
     minSpeechMs: settableParams.minSpeechMs,
+    framesToEmitMs: defaultVADParams.framesToEmitMs,
     submitUserSpeechOnPause: settableParams.submitUserSpeechOnPause,
 
     // From RealTimeVADCallbacks
@@ -558,6 +559,9 @@ const settableParamsToVADParams = async (
     },
     onSpeechRealStart: () => {
       console.log("Speech real start")
+    },
+    onEmitChunk() {
+      console.log("Emit chunk")
     },
 
     // From OrtOptions

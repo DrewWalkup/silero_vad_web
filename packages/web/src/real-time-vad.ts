@@ -46,6 +46,9 @@ interface RealTimeVADCallbacks {
 
   /** Callback to run when speech is detected as valid. (i.e. not a misfire) */
   onSpeechRealStart: () => Promise<void> | void
+
+  /** Callback to run everytime framesToEmitMs of audio accumulates in the audio buffer after speech start is detected. This will not run if  `framesToEmitMs` is 0 (default).*/
+  onEmitChunk: (audio: Float32Array) => Promise<void> | void
 }
 
 type AssetOptions = {
@@ -94,6 +97,7 @@ export const getDefaultRealTimeVADOptions = (
     onSpeechEnd: () => {
       log.debug("Detected speech end")
     },
+    onEmitChunk: () => {},
     onSpeechRealStart: () => {
       log.debug("Detected real speech start")
     },
@@ -307,6 +311,7 @@ export class MicVAD {
         redemptionMs: fullOptions.redemptionMs,
         preSpeechPadMs: fullOptions.preSpeechPadMs,
         minSpeechMs: fullOptions.minSpeechMs,
+        framesToEmitMs: fullOptions.framesToEmitMs,
         submitUserSpeechOnPause: fullOptions.submitUserSpeechOnPause,
       },
       msPerFrame
@@ -537,6 +542,10 @@ export class MicVAD {
 
       case Message.SpeechEnd:
         void this.options.onSpeechEnd(ev.audio)
+        break
+
+      case Message.EmitChunk:
+        void this.options.onEmitChunk(ev.audio)
         break
     }
   }
